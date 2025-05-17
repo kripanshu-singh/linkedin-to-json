@@ -1487,8 +1487,10 @@ window.LinkedinToResumeJson = (() => {
     /** @param {SchemaVersion} version */
     LinkedinToResumeJson.prototype.parseAndShowOutput = async function parseAndShowOutput(version = 'stable') {
         const rawJson = await this.parseAndGetRawJson(version);
+        const includedArray=this.profileParseSummary.liResponse.included
+        const image=includedArray.filter((item) => item.$type === 'com.linkedin.voyager.identity.shared.MiniProfile').find((item) => item.publicIdentifier === this.getProfileId());
         const parsedExport = {
-            raw: rawJson,
+            raw: {...rawJson, image},
             stringified: JSON.stringify(rawJson, null, 2)
         };
         console.log(parsedExport);
