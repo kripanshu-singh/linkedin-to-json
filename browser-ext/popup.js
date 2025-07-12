@@ -50,13 +50,18 @@ const getSelectedLang = () => {
     return LANG_SELECT.value;
 };
 
+function delay(ms = 1000) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
- * Get JS string that can be eval'ed to get the program to run and show output
- * Note: Be careful of strings versus vars, escaping, etc.
- * @param {SchemaVersion} version
+ * Generate code to run and show output
+ * @param {string} version
+ * @param {string} email
+ * @param {string} color
  */
-const getRunAndShowCode = (version) => {
-    return `liToJrInstance.preferLocale = '${getSelectedLang()}';liToJrInstance.parseAndShowOutput('${version}');`;
+const getRunAndShowCode = (version, email, color) => {
+    return `liToJrInstance.preferLocale = '${getSelectedLang()}';liToJrInstance.parseAndShowOutput('${version}', '${email}', '${color}');`;
 };
 
 /**
@@ -162,7 +167,17 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
 document.getElementById('liToJsonButton').addEventListener('click', async () => {
     const versionOption = await getSpecVersion();
-    const runAndShowCode = getRunAndShowCode(versionOption);
+
+    const emailInput = document.getElementById('appendEmail');
+    const colorInput = document.getElementById('appendColor');
+
+    const email = emailInput?.value ?? '';
+    const color = colorInput?.value ?? '';
+
+    await delay(1000);
+
+    const runAndShowCode = getRunAndShowCode(versionOption, email, color);
+
     chrome.tabs.executeScript(
         {
             code: `${runAndShowCode}`
@@ -171,7 +186,7 @@ document.getElementById('liToJsonButton').addEventListener('click', async () => 
             setTimeout(() => {
                 // Close popup
                 window.close();
-            }, 700);
+            }, 2000);
         }
     );
 });
