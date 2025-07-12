@@ -1484,16 +1484,47 @@ window.LinkedinToResumeJson = (() => {
         promptDownload(fileContents, fileName, 'application/json');
     };
 
+    /** Api call to n8n */
+    LinkedinToResumeJson.prototype.sendToN8nWebhook = async function sendToN8nWebhook(payload = {}) {
+        const webhookUrl = 'http://localhost:5678/webhook-test/717eef2d-9f9b-4f27-95e6-7ea16ec57ae6';
+
+        try {
+            const response = await fetch(webhookUrl, {
+                method: 'POST', // or 'GET', 'PUT', etc.
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                // Check if the response status is 2xx (success)
+                const responseData = await response.json(); // Parse the JSON response from n8n
+                alert('Webhook call successful');
+                console.log('Webhook call successful:', responseData);
+            } else {
+                const errorText = await response.text(); // Get error details if not successful
+                alert(`Webhook call failed with status ${response.status}: ${errorText}`);
+                console.error(`Webhook call failed with status ${response.status}:`, errorText);
+            }
+        } catch (error) {
+            console.error('Error sending data to webhook:', error);
+        }
+    };
+
     /** @param {SchemaVersion} version */
     LinkedinToResumeJson.prototype.parseAndShowOutput = async function parseAndShowOutput(version = 'stable') {
         const rawJson = await this.parseAndGetRawJson(version);
-        const includedArray=this.profileParseSummary.liResponse.included
-        const image=includedArray.filter((item) => item.$type === 'com.linkedin.voyager.identity.shared.MiniProfile').find((item) => item.publicIdentifier === this.getProfileId());
+        const includedArray = this.profileParseSummary.liResponse.included;
+        const image = includedArray.filter((item) => item.$type === 'com.linkedin.voyager.identity.shared.MiniProfile').find((item) => item.publicIdentifier === this.getProfileId());
+        this.sendToN8nWebhook({ ...rawJson, image });
+        
         const parsedExport = {
-            raw: {...rawJson, image},
+            raw: { ...rawJson, image },
             stringified: JSON.stringify(rawJson, null, 2)
         };
-        console.log(parsedExport);
+
+        console.log('fefewfewfewf', parsedExport);
         if (this.parseSuccess) {
             this.showModal(parsedExport.raw);
         } else {
