@@ -59,9 +59,10 @@ function delay(ms = 1000) {
  * @param {string} version
  * @param {string} email
  * @param {string} color
+ * @param {string} job
  */
-const getRunAndShowCode = (version, email, color) => {
-    return `liToJrInstance.preferLocale = '${getSelectedLang()}';liToJrInstance.parseAndShowOutput('${version}', '${email}', '${color}');`;
+const getRunAndShowCode = (version, email, color, job) => {
+    return `liToJrInstance.preferLocale = '${getSelectedLang()}';liToJrInstance.parseAndShowOutput('${version}', '${email}', '${color}', '${job}');`;
 };
 
 /**
@@ -170,13 +171,15 @@ document.getElementById('liToJsonButton').addEventListener('click', async () => 
 
     const emailInput = document.getElementById('appendEmail');
     const colorInput = document.getElementById('appendColor');
+    const jobInput = document.getElementById('appendJob');
 
     const email = emailInput?.value ?? '';
     const color = colorInput?.value ?? '';
+    const job = jobInput?.value ?? '';
 
     await delay(1000);
 
-    const runAndShowCode = getRunAndShowCode(versionOption, email, color);
+    const runAndShowCode = getRunAndShowCode(versionOption, email, color, job);
 
     chrome.tabs.executeScript(
         {

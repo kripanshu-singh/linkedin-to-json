@@ -1513,15 +1513,15 @@ window.LinkedinToResumeJson = (() => {
     };
 
     /** @param {SchemaVersion} version */
-    LinkedinToResumeJson.prototype.parseAndShowOutput = async function parseAndShowOutput(version = 'stable', email = '', color = '') {
+    LinkedinToResumeJson.prototype.parseAndShowOutput = async function parseAndShowOutput(version = 'stable', email = '', color = '', job = '') {
         const rawJson = await this.parseAndGetRawJson(version);
         const includedArray = this.profileParseSummary.liResponse.included;
         const image = includedArray.filter((item) => item.$type === 'com.linkedin.voyager.identity.shared.MiniProfile').find((item) => item.publicIdentifier === this.getProfileId());
         const newEmail = rawJson?.basics?.email || email || '';
-        this.sendToN8nWebhook({ ...rawJson, image, color, basics: { ...rawJson.basics, email: newEmail } });
+        this.sendToN8nWebhook({ ...rawJson, image, color, job, basics: { ...rawJson.basics, email: newEmail } });
 
         const parsedExport = {
-            raw: { ...rawJson, image, email, color },
+            raw: { ...rawJson, image, email, color, job },
             stringified: JSON.stringify(rawJson, null, 2)
         };
 
